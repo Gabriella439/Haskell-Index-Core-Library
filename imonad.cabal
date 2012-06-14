@@ -1,0 +1,37 @@
+Name: imonad
+Version: 1.0.0
+Cabal-Version: >=1.14.0
+Build-Type: Simple
+License: BSD3
+License-File: LICENSE
+Copyright: 2012 Gabriel Gonzalez
+Author: Gabriel Gonzalez
+Maintainer: Gabriel439@gmail.com
+Stability: Experimental
+Bug-Reports: mailto:Gabriel439@gmail.com
+Synopsis: Indexed Monads
+Description:
+  This library implements indexed monads in the style of Conor McBride,
+  described in the functional pearl \"Kleisli arrows of outrageous fortune\".
+  .
+  This library differs from other indexed monad implementations because it
+  permits indexed monads where the initial and final indices might not be known,
+  while still providing type-safe guarantees.
+  .
+  The core types, classes and helper functions reside in @Control.IMonad@,
+  which follows Conor McBride's presentation closely.  @Control.IMonad.Do@
+  re-exports @Control.IMonad@ and also rebinds the monad operations to indexed
+  monad operations for use with @do@ syntactic sugar.
+Category: Control, IMonad
+Tested-With: GHC ==7.4.1
+Source-Repository head
+    Type: git
+    Location: https://github.com/Gabriel439/Haskell-IMonad-Library
+
+Library
+    Build-Depends: base >= 4 && < 5
+    Exposed-Modules:
+        Control.IMonad,
+        Control.IMonad.Do
+    GHC-Options: -O
+    Default-Language: Haskell2010
