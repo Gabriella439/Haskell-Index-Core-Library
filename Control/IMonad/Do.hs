@@ -5,6 +5,7 @@
 -- > {-# LANGUAGE RebindableSyntax #-}
 -- >
 -- > import Control.IMonad.Do
+-- > import Prelude hiding (Monad(..))
 
 {-# LANGUAGE GADTs, Rank2Types, TypeOperators #-}
 
