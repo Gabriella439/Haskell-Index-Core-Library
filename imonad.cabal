@@ -11,12 +11,12 @@ Stability: Experimental
 Bug-Reports: mailto:Gabriel439@gmail.com
 Synopsis: Indexed Monads
 Description:
-  This library implements indexed monads in the style of Conor McBride,
+  This library implements indexed types in the style of Conor McBride,
   described in the functional pearl \"Kleisli arrows of outrageous fortune\".
   .
-  This library differs from other indexed monad implementations because it
-  permits indexed monads where the initial and final indices might not be known,
-  while still providing type-safe guarantees.
+  This library differs from other indexed type implementations because it
+  permits indexed monads where the initial and index might not be known, while
+  still providing type-safe guarantees.
   .
   The core types, classes and helper functions reside in @Control.IMonad@,
   which follows Conor McBride's presentation closely.  @Control.IMonad.Do@
@@ -32,6 +32,7 @@ Library
     Build-Depends: base >= 4 && < 5
     Exposed-Modules:
         Control.IMonad,
-        Control.IMonad.Do
+        Control.IMonad.Do,
+        Control.IMonad.Trans
     GHC-Options: -O
     Default-Language: Haskell2010
