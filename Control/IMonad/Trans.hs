@@ -14,6 +14,7 @@ module Control.IMonad.Trans (
 
 import Control.IMonad.Core
 import Control.IMonad.Restrict
+import Data.Index
 
 {- $transform
     Indexed monad transformers transform computations in a base /indexed/ monad

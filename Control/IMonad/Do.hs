@@ -1,12 +1,15 @@
--- | Use this module in conjunction with the @RebindableSyntax@ extension to
---   rebind @do@ notation to work with restricted monads.  This module
---   re-exports "Control.IMonad", so it only requires the following minimum file
---   header:
+-- | This module rebinds @do@ notation to work with restricted monads in
+--   conjunction with the @RebindableSyntax@ extension.  This module re-exports
+--   "Control.IMonad", so it only requires the following minimum file header:
 --
 -- > {-# LANGUAGE RebindableSyntax #-}
 -- >
 -- > import Control.IMonad.Do
 -- > import Prelude hiding (Monad(..))
+--
+-- The Prelude is reimported since @RebindableSyntax@ also includes the
+-- @NoImplicitPrelude@ extension, otherwise the @Monad@ bindings would conflict
+-- would these bindings.
 
 {-# LANGUAGE GADTs, Rank2Types, TypeOperators #-}
 

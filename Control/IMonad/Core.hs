@@ -8,7 +8,6 @@
 module Control.IMonad.Core (
     -- * Indexed Monads
     -- $imonads
-    (:->),
     IFunctor(..),
     IMonad(..),
     -- * Functions
@@ -19,7 +18,7 @@ module Control.IMonad.Core (
     (<?<)
     ) where
 
-import Control.Monad (liftM)
+import Data.Index
 
 infixr 1 =<?, <?<, >?>
 infixl 1 ?>=
@@ -31,9 +30,6 @@ infixl 1 ?>=
     final state of the 'bind' operation, permitting operations which may end in
     multiple possible states.
 -}
-
--- | An index-preserving function from @a@ to @b@
-type a :-> b = forall i . a i -> b i
 
 {-|
     An endofunctor within the category of index-preserving functions

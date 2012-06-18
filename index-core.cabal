@@ -29,6 +29,7 @@ Library
         Control.IMonad.Core,
         Control.IMonad.Restrict,
         Control.IMonad.Do,
-        Control.IMonad.Trans
+        Control.IMonad.Trans,
+        Data.Index
     GHC-Options: -O
     Default-Language: Haskell2010

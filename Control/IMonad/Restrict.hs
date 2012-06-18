@@ -94,13 +94,13 @@ forever :: (IMonad m) => R m i i a -> R m i j b
 forever m = m !> forever m
 
 {- $interop
-    The following types and functions transform ordinary types into indexed
-    types.
+    The following types and functions convert between ordinary monads and
+    restricted monads.
 
-    Use 'u' to convert an ordinary monad to an indexed monad so that it can
-    be used within an indexed @do@ block like so:
+    Use 'u' to convert an ordinary monad to a restricted monad so that it can be
+    used within an indexed @do@ block like so:
 
-> -- Both do blocks are indexed, using Control.IMonad.Do
+> -- Both do blocks are indexed, using syntax rebinding from Control.IMonad.Do
 > do x <- indexedAction
 >    lift $ do
 >        y <- u $ ordinaryAction1 x
@@ -115,7 +115,7 @@ forever m = m !> forever m
 -}
 
 -- | The 'U' type \'U\'pgrades ordinary monads to restricted monads
-data U f a i where
+data U m a i where
     U :: { unU :: m (a i) } -> U m a i
 
 instance (Monad m) => IFunctor (U m) where
@@ -129,7 +129,10 @@ instance (Monad m) => IMonad (U m) where
 u :: (Monad m) => m a -> R (U m) i i a
 u x = U (liftM V x)
 
--- | The 'D' type \'D\'owngrades restricted monads to ordinary monads
+{-|
+    The 'D' type \'D\'owngrades index-preserving restricted monads to ordinary
+    monads
+-}
 data D i m r = D { unD :: R m i i r }
 
 instance (IMonad m) => Monad (D i m) where
