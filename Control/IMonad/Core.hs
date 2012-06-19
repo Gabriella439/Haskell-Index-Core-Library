@@ -41,11 +41,11 @@ infixl 1 ?>=
 
     All instances must satisfy the functor laws:
 
-> imap id == id
+> fmapI id == id
 >
-> imap (f . g) == imap f . imap g
+> fmapI (f . g) == fmapI f . fmapI g
 -}
-class IFunctor f where imap :: (a :-> b) -> (f a :-> f b)
+class IFunctor f where fmapI :: (a :-> b) -> (f a :-> f b)
 
 {-|
     An indexed monad

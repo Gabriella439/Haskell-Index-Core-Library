@@ -137,7 +137,7 @@ data U m a i where
     U :: { unU :: m (a i) } -> U m a i
 
 instance (Monad m) => IFunctor (U m) where
-    imap f m = m ?>= (returnI . f)
+    fmapI f m = m ?>= (returnI . f)
 
 instance (Monad m) => IMonad (U m) where
     returnI = U . return
