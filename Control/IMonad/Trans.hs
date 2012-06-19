@@ -22,7 +22,7 @@ import Control.IMonad.Restrict
 
     Note that this does not lift ordinary monads.  To do that you must first
     convert the ordinary monad to a restricted monad using the 'u' function from
-    "Control.IMonad.Restrict" and then 'liftI' it like so:
+    "Control.IMonad.Restrict" and then use 'liftI' like so:
 
 > -- Using indexed do notation provided by Control.IMonad.Do
 > do x <- indexedActionInHigherMonad
@@ -46,5 +46,5 @@ class IMonadTrans t where
 
 > liftU = liftI . u
 -}
-liftU :: (Monad m, IMonadTrans t) => m a -> R (t (U m)) i i a
+liftU :: (Monad m, IMonadTrans t) => m a -> t (U m) (a := i) i
 liftU = liftI . u

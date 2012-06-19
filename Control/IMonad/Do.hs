@@ -28,17 +28,17 @@ import Control.IMonad
 import Prelude hiding (Monad(..))
 
 -- | 'return' replaces @return@ from @Control.Monad@.
-return :: (IMonad m) => a -> R m i i a
+return :: (IMonad m) => a -> m (a := i) i
 return = skipR
 
 -- | ('>>=') replaces (@>>=@) from @Control.Monad@.
-(>>=) :: (IMonad m) => R m i j a -> (a -> R m j k b) -> R m i k b
+(>>=) :: (IMonad m) => m (a := j) i -> (a -> m (b := k) j) -> m (b := k) i
 (>>=) = (!>=)
 
 -- | ('>>') replaces (@>>@) from @Control.Monad@.
-(>>) :: (IMonad m) => R m i j a -> R m j k b -> R m i k b
+(>>) :: (IMonad m) => m (a := j) i -> m (b := k) j -> m (b := k) i
 (>>) = (!>)
 
 -- | 'fail' replaces @fail@ from @Control.Monad@
-fail :: String -> m a i
+fail :: String -> m (a := j) i
 fail = error

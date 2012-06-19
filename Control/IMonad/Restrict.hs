@@ -1,7 +1,7 @@
 {-|
-    Restricted monads are a subset of indexed monads where the final state is
+    Restricted monads are a subset of indexed monads where the return value is
     restricted to a single index.  They build on top of 'IMonad' using the
-    (':=') type constructor which restricts the final state of the return value.
+    (':=') type constructor which restricts the index of the return value.
 -}
 
 {-# LANGUAGE TypeOperators, GADTs, Rank2Types #-}
@@ -37,13 +37,20 @@ infixr 1 =<!, <!<, >!>
 infixl 1 !>, !>=
 
 {- $restrict
-    The (':=') type constructor restricts the final index that the return value
+    The (':=') type constructor restricts the index that the return value
     inhabits.
 
     'skipR' and ('!>=') provide the restricted operations corresponding to
-    'skip' and ('?>=').
+    'skip' and ('?>=').  If 'skip' and ('?>=') satisfy the monad laws, then so
+    will 'skipR' and ('!>='):
 
-    Type type synonym 'R' rearranges the type variables of the restricted monad
+> skipR >!> f = f
+>
+> f >!> skipR = f
+>
+> (f >!> g) >!> h = f >!> (g >!>h)
+
+    The type synonym 'R' rearranges the type variables of the restricted monad
     to match conventional notation.
 -}
 
@@ -59,11 +66,11 @@ data (a := i) j where V :: a -> (a := i) i
 type R m i j a = m (a := j) i
 
 -- | A 'skip' that restricts the final index
-skipR :: (IMonad m) => a -> R m i i a
+skipR :: (IMonad m) => a -> m (a := i) i
 skipR = skip . V
 
 -- | A flipped 'bind' that restricts the intermediate and final index
-(!>=) :: (IMonad m) => R m i j a -> (a -> R m j k b) -> R m i k b
+(!>=) :: (IMonad m) => m (a := j) i -> (a -> m (b := k) j) -> m (b := k) i
 m !>= f = bind (\(V a) -> f a) m
 
 {- $functions
@@ -71,11 +78,11 @@ m !>= f = bind (\(V a) -> f a) m
 -}
 
 -- | A 'bind' that restricts the intermediate and final index
-(=<!) :: (IMonad m) => (a -> R m j k b) -> R m i j a -> R m i k b
+(=<!) :: (IMonad m) => (a -> m (b := k) j) -> m (a := j) i -> m (b := k) i
 (=<!) = flip (!>=)
 
 -- | Sequence two indexed monads
-(!>) :: (IMonad m) => R m i j a -> R m j k b -> R m i k b
+(!>) :: (IMonad m) => m (a := j) i -> m (b := k) j -> m (b := k) i
 m1 !> m2 = m1 !>= \_ -> m2
 
 {-|
@@ -83,7 +90,8 @@ m1 !> m2 = m1 !>= \_ -> m2
 
     This is equivalent to ('>>>') from @Control.Category@.
 -}
-(>!>) :: (IMonad m) => (a -> R m i j b) -> (b -> R m j k c) -> (a -> R m i k c)
+(>!>) :: (IMonad m) =>
+    (a -> m (b:= j) i) -> (b -> m (c := k) j) -> (a -> m (c := k) i)
 f >!> g = \x -> f x !>= g
 
 {-|
@@ -91,15 +99,16 @@ f >!> g = \x -> f x !>= g
 
     This is equivalent to ('<<<') from @Control.Category@.
 -}
-(<!<) :: (IMonad m) => (b -> R m j k c) -> (a -> R m i j b) -> (a -> R m i k c)
+(<!<) :: (IMonad m) =>
+    (b -> m (c := k) j) -> (a -> m (b := j) i) -> (a -> m (c := k) i)
 f <!< g = \x -> f =<! g x
 
 -- | 'joinR' joins two monad layers into one
-joinR :: (IMonad m) => R m i j (R m j k a) -> R m i k a
+joinR :: (IMonad m) => m ((m (a := k) j) := j) i -> m (a := k) i
 joinR m = m !>= id
 
 -- | 'foreverR' repeats the action indefinitely
-foreverR :: (IMonad m) => R m i i a -> R m i j b
+foreverR :: (IMonad m) => m (a := i) i -> m (b := j) i
 foreverR m = m !> foreverR m
 
 {- $interop
@@ -135,14 +144,14 @@ instance (Monad m) => IMonad (U m) where
     bind f (U m) = U (m >>= (unU . f))
 
 -- | 'u' transforms an ordinary monad into a restricted monad
-u :: (Monad m) => m a -> R (U m) i i a
+u :: (Monad m) => m a -> (U m) (a := i) i
 u x = U (liftM V x)
 
 {-|
     The 'D' type \'D\'owngrades index-preserving restricted monads to ordinary
     monads
 -}
-data D i m r = D { unD :: R m i i r }
+data D i m r = D { unD :: m (r := i) i }
 
 instance (IMonad m) => Monad (D i m) where
     return = D . skipR

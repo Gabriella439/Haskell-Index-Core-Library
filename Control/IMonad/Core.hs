@@ -25,6 +25,10 @@ infixr 1 =<?, <?<, >?>
 infixl 1 ?>=
 
 {- $imonads
+    I deviate from Conor's terminology, referring to his monads on indexed types
+    as \"indexed monads\" and referring to his indexed monads as \"restricted
+    monads\".  This module provides \"indexed monads\".
+
     Indexed monads generalize the traditional approach to parametrizing the
     initial and final states of ordinary monads.  The 'IMonad' class does not
     require specifying a concrete index of kind @*@ for the intermediate or
@@ -48,11 +52,11 @@ class IFunctor f where imap :: (a :-> b) -> (f a :-> f b)
 
     All instances must satisfy the monad laws:
 
-> bind skip == id
+> skip >?> f = f
 >
-> bind f (skip x) == f x
+> f >?> skip = f
 >
-> bind g (bind f m) == bind (\x -> bind g (f x)) m
+> (f >?> g) >?> h = f >?> (g >?> h)
 -}
 class (IFunctor m) => IMonad m where
     skip ::  a :-> m a
