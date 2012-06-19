@@ -32,5 +32,5 @@ Library
         Control.IMonad.Restrict,
         Control.IMonad.Do,
         Control.IMonad.Trans
-    GHC-Options: -O
+    GHC-Options: -O2
     Default-Language: Haskell2010
