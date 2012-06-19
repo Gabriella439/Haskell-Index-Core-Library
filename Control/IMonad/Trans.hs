@@ -34,7 +34,7 @@ import Control.IMonad.Restrict
 
     All instances must satisfy the monad transformer laws:
 
-> liftI . skip = skip
+> liftI . returnI = returnI
 >
 > liftI . (f >?> g) = (liftI . f) >?> (liftI . g)
 -}

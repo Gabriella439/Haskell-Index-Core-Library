@@ -29,7 +29,7 @@ import Prelude hiding (Monad(..))
 
 -- | 'return' replaces @return@ from @Control.Monad@.
 return :: (IMonad m) => a -> m (a := i) i
-return = skipR
+return = returnR
 
 -- | ('>>=') replaces (@>>=@) from @Control.Monad@.
 (>>=) :: (IMonad m) => m (a := j) i -> (a -> m (b := k) j) -> m (b := k) i

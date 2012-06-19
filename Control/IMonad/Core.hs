@@ -32,7 +32,7 @@ infixl 1 ?>=
     Indexed monads generalize the traditional approach to parametrizing the
     initial and final states of ordinary monads.  The 'IMonad' class does not
     require specifying a concrete index of kind @*@ for the intermediate or
-    final state of the 'bind' operation, permitting operations which may end in
+    final state of the 'bindI' operation, permitting operations which may end in
     multiple possible states.
 -}
 
@@ -52,27 +52,27 @@ class IFunctor f where imap :: (a :-> b) -> (f a :-> f b)
 
     All instances must satisfy the monad laws:
 
-> skip >?> f = f
+> returnI >?> f = f
 >
-> f >?> skip = f
+> f >?> returnI = f
 >
 > (f >?> g) >?> h = f >?> (g >?> h)
 -}
 class (IFunctor m) => IMonad m where
-    skip ::  a :-> m a
-    bind :: (a :-> m b) -> (m a :-> m b)
+    returnI ::  a :-> m a
+    bindI :: (a :-> m b) -> (m a :-> m b)
 
 {- $functions
-    Functions derived from 'skip' and 'bind'
+    Functions derived from 'returnI' and 'bindI'
 -}
 
--- | An infix 'bind'
+-- | An infix 'bindI'
 (=<?) :: (IMonad m) => (a :-> m b) -> (m a :-> m b)
-(=<?) = bind
+(=<?) = bindI
 
--- | An infix 'bind' with arguments flipped
+-- | An infix 'bindI' with arguments flipped
 (?>=) :: (IMonad m) => m a i -> (a :-> m b) -> m b i
-(?>=) = flip bind
+(?>=) = flip bindI
 
 {-|
     Composition of indexed Kleisli arrows

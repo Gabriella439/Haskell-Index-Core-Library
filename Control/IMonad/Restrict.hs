@@ -11,7 +11,7 @@ module Control.IMonad.Restrict (
     -- $restrict
     (:=)(..),
     R,
-    skipR,
+    returnR,
     (!>=),
     -- * Functions
     -- $functions
@@ -40,15 +40,15 @@ infixl 1 !>, !>=
     The (':=') type constructor restricts the index that the return value
     inhabits.
 
-    'skipR' and ('!>=') provide the restricted operations corresponding to
-    'skip' and ('?>=').  If 'skip' and ('?>=') satisfy the monad laws, then so
-    will 'skipR' and ('!>='):
+    'returnR' and ('!>=') provide the restricted operations corresponding to
+    'returnI' and ('?>=').  If 'returnI' and ('?>=') satisfy the monad laws,
+    then so will 'returnR' and ('!>='):
 
-> skipR >!> f = f
+> returnR >!> f = f
 >
-> f >!> skipR = f
+> f >!> returnR = f
 >
-> (f >!> g) >!> h = f >!> (g >!>h)
+> (f >!> g) >!> h = f >!> (g >!> h)
 
     The type synonym 'R' rearranges the type variables of the restricted monad
     to match conventional notation.
@@ -65,19 +65,19 @@ data (a := i) j where V :: a -> (a := i) i
 -- | An indexed monad where the final index, @j@, is \'R\'estricted
 type R m i j a = m (a := j) i
 
--- | A 'skip' that restricts the final index
-skipR :: (IMonad m) => a -> m (a := i) i
-skipR = skip . V
+-- | A 'returnI' that restricts the final index
+returnR :: (IMonad m) => a -> m (a := i) i
+returnR = returnI . V
 
--- | A flipped 'bind' that restricts the intermediate and final index
+-- | A flipped 'bindI' that restricts the intermediate and final index
 (!>=) :: (IMonad m) => m (a := j) i -> (a -> m (b := k) j) -> m (b := k) i
-m !>= f = bind (\(V a) -> f a) m
+m !>= f = bindI (\(V a) -> f a) m
 
 {- $functions
-    Functions derived from 'skipR' and ('!>=')
+    Functions derived from 'returnR' and ('!>=')
 -}
 
--- | A 'bind' that restricts the intermediate and final index
+-- | A 'bindI' that restricts the intermediate and final index
 (=<!) :: (IMonad m) => (a -> m (b := k) j) -> m (a := j) i -> m (b := k) i
 (=<!) = flip (!>=)
 
@@ -137,11 +137,11 @@ data U m a i where
     U :: { unU :: m (a i) } -> U m a i
 
 instance (Monad m) => IFunctor (U m) where
-    imap f m = m ?>= (skip . f)
+    imap f m = m ?>= (returnI . f)
 
 instance (Monad m) => IMonad (U m) where
-    skip = U . return
-    bind f (U m) = U (m >>= (unU . f))
+    returnI = U . return
+    bindI f (U m) = U (m >>= (unU . f))
 
 -- | 'u' transforms an ordinary monad into a restricted monad
 u :: (Monad m) => m a -> (U m) (a := i) i
@@ -154,5 +154,5 @@ u x = U (liftM V x)
 data D i m r = D { unD :: m (r := i) i }
 
 instance (IMonad m) => Monad (D i m) where
-    return = D . skipR
+    return = D . returnR
     (D m) >>= f = D (m !>= (unD . f))
