@@ -1,12 +1,11 @@
 -- | This module provides the core (':->') type operator, which links the world
 --   of indexed types and the world of unindexed types.
 --
---   You can use this type operator with the following extensions:
+--   You can use this type operator with the following extension:
 --
--- > {-# LANGUAGE TypeOperators, Rank2Types #-}
+-- > {-# LANGUAGE TypeOperators #-}
 --
---   However, even if you don't use it, you may still need @Rank2Types@ anyway
---   to express index-preserving functions.
+--   Sometimes you may also need the @Rank2Types@ extension.
 
 {-# LANGUAGE TypeOperators, Rank2Types #-}
 
