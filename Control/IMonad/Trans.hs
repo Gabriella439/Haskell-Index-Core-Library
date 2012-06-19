@@ -12,9 +12,9 @@ module Control.IMonad.Trans (
     liftU
     ) where
 
+import Control.Category.Index
 import Control.IMonad.Core
 import Control.IMonad.Restrict
-import Data.Index
 
 {- $transform
     Indexed monad transformers transform computations in a base /indexed/ monad
@@ -22,11 +22,11 @@ import Data.Index
 
     Note that this does not lift ordinary monads.  To do that you must first
     convert the ordinary monad to a restricted monad using the 'u' function from
-    "Control.IMonad.Restrict" and then 'lift' it like so:
+    "Control.IMonad.Restrict" and then 'liftI' it like so:
 
 > -- Using indexed do notation provided by Control.IMonad.Do
 > do x <- indexedActionInHigherMonad
->    lift $ u $ ordinaryActionInBaseMonad x
+>    liftI $ u $ ordinaryActionInBaseMonad x
 -}
 
 {-|
@@ -34,16 +34,17 @@ import Data.Index
 
     All instances must satisfy the monad transformer laws:
 
-> lift . skip = skip
-> lift . (f >?> g) = (lift . f) >?> (lift . g)
+> liftI . skip = skip
+>
+> liftI . (f >?> g) = (liftI . f) >?> (liftI . g)
 -}
 class IMonadTrans t where
-    lift :: (IMonad m) => m a :-> t m a
+    liftI :: (IMonad m) => m a :-> t m a
 
 {-|
-    Use this to lift ordinary monads for indexed monad transformers
+    Lifts ordinary monads for restricted monad transformers
 
-> liftU = lift . u
+> liftU = liftI . u
 -}
 liftU :: (Monad m, IMonadTrans t) => m a -> R (t (U m)) i i a
-liftU = lift . u
+liftU = liftI . u

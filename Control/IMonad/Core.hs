@@ -18,7 +18,8 @@ module Control.IMonad.Core (
     (<?<)
     ) where
 
-import Data.Index
+import Control.Category ((<<<), (>>>))
+import Control.Category.Index
 
 infixr 1 =<?, <?<, >?>
 infixl 1 ?>=
@@ -69,10 +70,18 @@ class (IFunctor m) => IMonad m where
 (?>=) :: (IMonad m) => m a i -> (a :-> m b) -> m b i
 (?>=) = flip bind
 
--- | Composition of indexed Kleisli arrows (equivalent to @>>>@)
+{-|
+    Composition of indexed Kleisli arrows
+
+    This is equivalent to ('>>>') from @Control.Category@.
+-}
 (>?>) :: (IMonad m) => (a :-> m b) -> (b :-> m c) -> (a :-> m c)
 f >?> g = \x -> f x ?>= g
 
--- | Composition of indexed Kleisli arrows (equivalent to @<<<@)
+{-|
+    Composition of indexed Kleisli arrows
+
+    This is equivalent to ('<<<') from @Control.Category@.
+-}
 (<?<) :: (IMonad m) => (b :-> m c) -> (a :-> m b) -> (a :-> m c)
 f <?< g = \x -> f =<? g x

@@ -11,7 +11,7 @@ module Control.IMonad.Restrict (
     -- $restrict
     (:=)(..),
     R,
-    rskip,
+    skipR,
     (!>=),
     -- * Functions
     -- $functions
@@ -19,8 +19,8 @@ module Control.IMonad.Restrict (
     (!>),
     (>!>),
     (<!<),
-    join,
-    forever,
+    joinR,
+    foreverR,
     -- * Interoperability
     -- $interop
     U(..),
@@ -28,6 +28,7 @@ module Control.IMonad.Restrict (
     D(..)
     ) where
 
+import Control.Category ((<<<), (>>>))
 import Control.IMonad.Core
 import Control.Monad (liftM)
 
@@ -39,7 +40,7 @@ infixl 1 !>, !>=
     The (':=') type constructor restricts the final index that the return value
     inhabits.
 
-    'rskip' and ('!>=') provide the restricted operations corresponding to
+    'skipR' and ('!>=') provide the restricted operations corresponding to
     'skip' and ('?>=').
 
     Type type synonym 'R' rearranges the type variables of the restricted monad
@@ -54,19 +55,19 @@ infixl 1 !>, !>=
 -}
 data (a := i) j where V :: a -> (a := i) i
 
--- | An indexed monad where the final index is \'R\'estricted
+-- | An indexed monad where the final index, @j@, is \'R\'estricted
 type R m i j a = m (a := j) i
 
 -- | A 'skip' that restricts the final index
-rskip :: (IMonad m) => a -> R m i i a
-rskip = skip . V
+skipR :: (IMonad m) => a -> R m i i a
+skipR = skip . V
 
 -- | A flipped 'bind' that restricts the intermediate and final index
 (!>=) :: (IMonad m) => R m i j a -> (a -> R m j k b) -> R m i k b
 m !>= f = bind (\(V a) -> f a) m
 
 {- $functions
-    Functions derived from 'rskip' and ('!>=')
+    Functions derived from 'skipR' and ('!>=')
 -}
 
 -- | A 'bind' that restricts the intermediate and final index
@@ -77,21 +78,29 @@ m !>= f = bind (\(V a) -> f a) m
 (!>) :: (IMonad m) => R m i j a -> R m j k b -> R m i k b
 m1 !> m2 = m1 !>= \_ -> m2
 
--- | Composition of restricted Kleisli arrows (equivalent to @>>>@)
+{-|
+    Composition of restricted Kleisli arrows
+
+    This is equivalent to ('>>>') from @Control.Category@.
+-}
 (>!>) :: (IMonad m) => (a -> R m i j b) -> (b -> R m j k c) -> (a -> R m i k c)
 f >!> g = \x -> f x !>= g
 
--- | Composition of restricted Kleisli arrows (equivalent to @<<<@)
+{-|
+    Composition of restricted Kleisli arrows
+
+    This is equivalent to ('<<<') from @Control.Category@.
+-}
 (<!<) :: (IMonad m) => (b -> R m j k c) -> (a -> R m i j b) -> (a -> R m i k c)
 f <!< g = \x -> f =<! g x
 
--- | 'join' joins two monad layers into one
-join :: (IMonad m) => R m i j (R m j k a) -> R m i k a
-join m = m !>= id
+-- | 'joinR' joins two monad layers into one
+joinR :: (IMonad m) => R m i j (R m j k a) -> R m i k a
+joinR m = m !>= id
 
--- | 'forever' repeats the action indefinitely
-forever :: (IMonad m) => R m i i a -> R m i j b
-forever m = m !> forever m
+-- | 'foreverR' repeats the action indefinitely
+foreverR :: (IMonad m) => R m i i a -> R m i j b
+foreverR m = m !> foreverR m
 
 {- $interop
     The following types and functions convert between ordinary monads and
@@ -125,7 +134,7 @@ instance (Monad m) => IMonad (U m) where
     skip = U . return
     bind f (U m) = U (m >>= (unU . f))
 
--- | 'u' transforms a functor into a restricted functor
+-- | 'u' transforms an ordinary monad into a restricted monad
 u :: (Monad m) => m a -> R (U m) i i a
 u x = U (liftM V x)
 
@@ -136,5 +145,5 @@ u x = U (liftM V x)
 data D i m r = D { unD :: R m i i r }
 
 instance (IMonad m) => Monad (D i m) where
-    return = D . rskip
+    return = D . skipR
     (D m) >>= f = D (m !>= (unD . f))

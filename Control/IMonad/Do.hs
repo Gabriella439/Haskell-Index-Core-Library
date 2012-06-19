@@ -8,27 +8,28 @@
 -- > import Prelude hiding (Monad(..))
 --
 -- The Prelude is reimported since @RebindableSyntax@ also includes the
--- @NoImplicitPrelude@ extension, otherwise the @Monad@ bindings would conflict
--- would these bindings.
+-- @NoImplicitPrelude@ extension, otherwise the Prelude's @Monad@ bindings would
+-- conflict with these bindings.
 
 {-# LANGUAGE GADTs, Rank2Types, TypeOperators #-}
 
 module Control.IMonad.Do (
-    module Control.IMonad.Core,
+    -- * Modules
+    module Control.IMonad,
+    -- * Rebindings
     return,
     (>>=),
     (>>),
     fail
     ) where
 
-import Control.IMonad.Core
-import Control.IMonad.Restrict
+import Control.IMonad
 
 import Prelude hiding (Monad(..))
 
 -- | 'return' replaces @return@ from @Control.Monad@.
 return :: (IMonad m) => a -> R m i i a
-return = rskip
+return = skipR
 
 -- | ('>>=') replaces (@>>=@) from @Control.Monad@.
 (>>=) :: (IMonad m) => R m i j a -> (a -> R m j k b) -> R m i k b
