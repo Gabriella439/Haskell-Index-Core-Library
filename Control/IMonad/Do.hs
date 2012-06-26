@@ -24,8 +24,9 @@ module Control.IMonad.Do (
     ) where
 
 import Control.IMonad
-
 import Prelude hiding (Monad(..))
+
+infixl 1 >>, >>=
 
 -- | 'return' replaces @return@ from @Control.Monad@.
 return :: (IMonad m) => a -> m (a := i) i
