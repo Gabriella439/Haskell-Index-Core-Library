@@ -20,7 +20,18 @@ module Control.IMonad.Restrict (
     (>!>),
     (<!<),
     joinR,
+    voidR,
     foreverR,
+    mapMR,
+    mapMR_,
+    forMR,
+    forMR_,
+    replicateMR,
+    replicateMR_,
+    sequenceR,
+    sequenceR_,
+    whenR,
+    unlessR,
     -- * Interoperability
     -- $interop
     U(..),
@@ -107,9 +118,62 @@ f <!< g = \x -> f =<! g x
 joinR :: (IMonad m) => m ((m (a := k) j) := j) i -> m (a := k) i
 joinR m = m !>= id
 
+-- | Discard the result of evaluation
+voidR :: (IMonad m) => m (a := i) i -> m (() := i) i
+voidR m = m !> returnR ()
+
 -- | 'foreverR' repeats the action indefinitely
 foreverR :: (IMonad m) => m (a := i) i -> m (b := j) i
 foreverR m = m !> foreverR m
+
+-- | \"@mapMR f@\" is equivalent to \"@sequenceR . map f@\"
+mapMR :: (IMonad m) => (a -> m (b := i) i) -> [a] -> m ([b] := i) i
+{-# INLINE mapMR #-}
+mapMR f as = sequenceR (map f as)
+
+-- | \"@mapMR_ f@\" is equivalent to \"@sequenceR_ . map f@\"
+mapMR_ :: (IMonad m) => (a -> m (b := i) i) -> [a] -> m (() := i) i
+{-# INLINE mapMR_ #-}
+mapMR_ f as = sequenceR_ (map f as)
+
+-- | 'mapMR' with its arguments flipped
+forMR :: (IMonad m) => [a] -> (a -> m (b := i) i) -> m ([b] := i) i
+{-# INLINE forMR #-}
+forMR = flip mapMR
+
+-- | 'mapMR_' with its arguments flipped
+forMR_ :: (IMonad m) => [a] -> (a -> m (b := i) i) -> m (() := i) i
+{-# INLINE forMR_ #-}
+forMR_ = flip mapMR_
+
+-- | \"@replicateMR n m@\" performs @m@ @n@ times and collects the results
+replicateMR :: (IMonad m) => Int -> m (a := i) i -> m ([a] := i) i
+replicateMR n x = sequenceR (replicate n x)
+
+-- | \"@replicateMR_ n m@\" performs @m@ @n@ times and ignores the results
+replicateMR_ :: (IMonad m) => Int -> m (a := i) i -> m (() := i) i
+replicateMR_ n x = sequenceR_ (replicate n x)
+
+-- | Evaluate each action from left to right and collect the results
+sequenceR :: (IMonad m) => [m (a := i) i] -> m ([a] := i) i
+{-# INLINE sequenceR #-}
+sequenceR ms = foldr k (returnR []) ms where
+    k m m' = m  !>= \x  ->
+             m' !>= \xs ->
+             returnR (x:xs)
+
+-- | Evaluate each action from left to right and ignore the results
+sequenceR_ :: (IMonad m) => [m (a := i) i] -> m (() := i) i
+{-# INLINE sequenceR_ #-}
+sequenceR_ ms = foldr (!>) (returnR ()) ms
+
+-- | \"@whenR p m@\" executes @m@ if @p@ is 'True'
+whenR :: (IMonad m) => Bool -> m (() := i) i -> m (() := i) i
+whenR p s = if p then s else returnR ()
+
+-- | \"@unlessR p m@\" executes @m@ if @p@ is 'False'
+unlessR :: (IMonad m) => Bool -> m (() := i) i -> m (() := i) i
+unlessR p s = if p then returnR () else s
 
 {- $interop
     The following types and functions convert between ordinary monads and
