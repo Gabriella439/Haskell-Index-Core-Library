@@ -15,6 +15,9 @@ module Control.IMonad.Restrict (
     (!>=),
     -- * Functions
     -- $functions
+    fmapR,
+    (<!>),
+    (<.>),
     (=<!),
     (!>),
     (>!>),
@@ -88,6 +91,18 @@ m !>= f = bindI (\(V a) -> f a) m
     Functions derived from 'returnR' and ('!>=')
 -}
 
+-- | All restricted monads are ordinary functors
+fmapR :: (IMonad m) => (a -> b) -> m (a := j) i -> m (b := j) i
+fmapR f m = m !>= returnR . f
+
+-- | Infix 'fmapR'
+(<!>) :: (IMonad m) => (a -> b) -> m (a := j) i -> m (b := j) i
+(<!>) = fmapR
+
+-- | All restricted monads are restricted applicatives
+(<.>) :: (IMonad m) => m ((a -> b) := j) i -> m (a := k) j -> m (b := k) i
+mf <.> mx = mf !>= \f -> f <!> mx
+
 -- | A 'bindI' that restricts the intermediate and final index
 (=<!) :: (IMonad m) => (a -> m (b := k) j) -> m (a := j) i -> m (b := k) i
 (=<!) = flip (!>=)
@@ -124,7 +139,7 @@ voidR m = m !> returnR ()
 
 -- | 'foreverR' repeats the action indefinitely
 foreverR :: (IMonad m) => m (a := i) i -> m (b := j) i
-foreverR m = m !> foreverR m
+foreverR m = let r = m !> r in r
 
 -- | \"@mapMR f@\" is equivalent to \"@sequenceR . map f@\"
 mapMR :: (IMonad m) => (a -> m (b := i) i) -> [a] -> m ([b] := i) i
