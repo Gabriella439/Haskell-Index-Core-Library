@@ -44,7 +44,8 @@ module Control.IMonad.Restrict (
 
 import Control.Category ((<<<), (>>>))
 import Control.IMonad.Core
-import Control.Monad (liftM)
+import Control.Monad (liftM, ap)
+import Control.Applicative (Applicative (..))
 
 -- Just copying the fixities from Control.Monad
 infixr 1 =<!, <!<, >!>
@@ -235,3 +236,10 @@ data D i m r = D { unD :: m (r := i) i }
 instance (IMonad m) => Monad (D i m) where
     return = D . returnR
     (D m) >>= f = D (m !>= (unD . f))
+
+instance (IMonad m) => Applicative (D i m) where
+    pure = return
+    (<*>) = ap
+
+instance (IMonad m) => Functor (D i m) where
+    fmap f (D m) = D (fmapR f m)
