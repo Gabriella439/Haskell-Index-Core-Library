@@ -84,8 +84,10 @@ type R m i j a = m (a := j) i
 returnR :: (IMonad m) => a -> m (a := i) i
 returnR = returnI . V
 
--- | A flipped 'bindI' that restricts the intermediate and final index
-(!>=) :: (IMonad m) => m (a := j) i -> (a -> m (b := k) j) -> m (b := k) i
+{-| A flipped 'bindI' that restricts the intermediate and final index.
+    Called \"angelic bind\" in Conor McBride's paper.
+-}
+(!>=) :: (IMonad m) => m (a := j) i -> (a -> m b j) -> m b i
 m !>= f = bindI (\(V a) -> f a) m
 
 {- $functions
@@ -105,11 +107,11 @@ fmapR f m = m !>= returnR . f
 mf <.> mx = mf !>= \f -> f <!> mx
 
 -- | A 'bindI' that restricts the intermediate and final index
-(=<!) :: (IMonad m) => (a -> m (b := k) j) -> m (a := j) i -> m (b := k) i
+(=<!) :: (IMonad m) => (a -> m b j) -> m (a := j) i -> m b i
 (=<!) = flip (!>=)
 
 -- | Sequence two indexed monads
-(!>) :: (IMonad m) => m (a := j) i -> m (b := k) j -> m (b := k) i
+(!>) :: (IMonad m) => m (a := j) i -> m b j -> m b i
 m1 !> m2 = m1 !>= \_ -> m2
 
 {-|
@@ -118,7 +120,7 @@ m1 !> m2 = m1 !>= \_ -> m2
     This is equivalent to ('>>>') from @Control.Category@.
 -}
 (>!>) :: (IMonad m) =>
-    (a -> m (b:= j) i) -> (b -> m (c := k) j) -> (a -> m (c := k) i)
+    (a -> m (b := j) i) -> (b -> m c j) -> (a -> m c i)
 f >!> g = \x -> f x !>= g
 
 {-|
@@ -127,11 +129,11 @@ f >!> g = \x -> f x !>= g
     This is equivalent to ('<<<') from @Control.Category@.
 -}
 (<!<) :: (IMonad m) =>
-    (b -> m (c := k) j) -> (a -> m (b := j) i) -> (a -> m (c := k) i)
+    (b -> m c j) -> (a -> m (b := j) i) -> (a -> m c i)
 f <!< g = \x -> f =<! g x
 
 -- | 'joinR' joins two monad layers into one
-joinR :: (IMonad m) => m ((m (a := k) j) := j) i -> m (a := k) i
+joinR :: (IMonad m) => m (m a j := j) i -> m a i
 joinR m = m !>= id
 
 -- | Discard the result of evaluation
