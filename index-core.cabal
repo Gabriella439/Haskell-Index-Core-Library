@@ -1,6 +1,6 @@
 Name: index-core
 Version: 1.0.2
-Cabal-Version: >=1.14.0
+Cabal-Version: >=1.10
 Build-Type: Simple
 License: BSD3
 License-File: LICENSE
