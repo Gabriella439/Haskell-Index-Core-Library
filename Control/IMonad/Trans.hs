@@ -3,7 +3,7 @@
     the @transformers@ package.
 -}
 
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators, PolyKinds #-}
 
 module Control.IMonad.Trans (
     -- * Monad Transformers
