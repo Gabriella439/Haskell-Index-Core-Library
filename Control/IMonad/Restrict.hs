@@ -4,7 +4,7 @@
     (':=') type constructor which restricts the index of the return value.
 -}
 
-{-# LANGUAGE TypeOperators, GADTs, Rank2Types #-}
+{-# LANGUAGE TypeOperators, GADTs, Rank2Types, PolyKinds #-}
 
 module Control.IMonad.Restrict (
     -- * Restriction

@@ -3,7 +3,7 @@
     indexed counterparts to 'Functor' and 'Monad' from @Control.Monad@.
 -}
 
-{-# LANGUAGE Rank2Types, TypeOperators #-}
+{-# LANGUAGE Rank2Types, TypeOperators, PolyKinds #-}
 
 module Control.IMonad.Core (
     -- * Indexed Monads
@@ -31,7 +31,7 @@ infixl 1 ?>=
 
     Indexed monads generalize the traditional approach to parametrizing the
     initial and final states of ordinary monads.  The 'IMonad' class does not
-    require specifying a concrete index of kind @*@ for the intermediate or
+    require specifying a concrete index of kind @k@ for the intermediate or
     final state of the 'bindI' operation, permitting operations which may end in
     multiple possible states.
 -}
