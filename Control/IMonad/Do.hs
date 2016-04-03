@@ -11,7 +11,7 @@
 -- @NoImplicitPrelude@ extension, otherwise the Prelude's @Monad@ bindings would
 -- conflict with these bindings.
 
-{-# LANGUAGE GADTs, Rank2Types, TypeOperators #-}
+{-# LANGUAGE GADTs, Rank2Types, TypeOperators, PolyKinds #-}
 
 module Control.IMonad.Do (
     -- * Modules
