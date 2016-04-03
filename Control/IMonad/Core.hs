@@ -72,7 +72,7 @@ class (IFunctor m) => IMonad m where
 
 -- | An infix 'bindI' with arguments flipped
 (?>=) :: (IMonad m) => m a i -> (a :-> m b) -> m b i
-(?>=) = flip bindI
+m ?>= k = bindI k m
 
 {-|
     Composition of indexed Kleisli arrows
