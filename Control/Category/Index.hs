@@ -7,7 +7,7 @@
 --
 --   Sometimes you may also need the @Rank2Types@ extension.
 
-{-# LANGUAGE TypeOperators, Rank2Types #-}
+{-# LANGUAGE TypeOperators, Rank2Types, CPP #-}
 #if MIN_VERSION_base(4,6,0)
 {-# LANGUAGE PolyKinds #-}
 #endif

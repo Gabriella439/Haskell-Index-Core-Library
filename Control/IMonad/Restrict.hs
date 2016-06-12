@@ -4,7 +4,7 @@
     (':=') type constructor which restricts the index of the return value.
 -}
 
-{-# LANGUAGE TypeOperators, GADTs, Rank2Types #-}
+{-# LANGUAGE TypeOperators, GADTs, Rank2Types, CPP #-}
 #if MIN_VERSION_base(4,6,0)
 {-# LANGUAGE PolyKinds #-}
 #endif

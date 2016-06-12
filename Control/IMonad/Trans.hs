@@ -3,7 +3,7 @@
     the @transformers@ package.
 -}
 
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE TypeOperators, CPP #-}
 #if MIN_VERSION_base(4,6,0)
 {-# LANGUAGE PolyKinds #-}
 #endif

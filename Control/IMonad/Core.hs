@@ -3,7 +3,7 @@
     indexed counterparts to 'Functor' and 'Monad' from @Control.Monad@.
 -}
 
-{-# LANGUAGE Rank2Types, TypeOperators #-}
+{-# LANGUAGE Rank2Types, TypeOperators, CPP #-}
 #if MIN_VERSION_base(4,6,0)
 {-# LANGUAGE PolyKinds #-}
 #endif
