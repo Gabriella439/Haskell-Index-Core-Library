@@ -3,7 +3,10 @@
     the @transformers@ package.
 -}
 
-{-# LANGUAGE TypeOperators, PolyKinds #-}
+{-# LANGUAGE TypeOperators #-}
+#if MIN_VERSION_base(4,6,0)
+{-# LANGUAGE PolyKinds #-}
+#endif
 
 module Control.IMonad.Trans (
     -- * Monad Transformers

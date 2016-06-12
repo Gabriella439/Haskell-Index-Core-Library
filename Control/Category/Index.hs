@@ -7,7 +7,10 @@
 --
 --   Sometimes you may also need the @Rank2Types@ extension.
 
-{-# LANGUAGE TypeOperators, Rank2Types, PolyKinds #-}
+{-# LANGUAGE TypeOperators, Rank2Types #-}
+#if MIN_VERSION_base(4,6,0)
+{-# LANGUAGE PolyKinds #-}
+#endif
 
 module Control.Category.Index (
     -- * Index-Preserving Functions
